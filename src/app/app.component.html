@@ -1,0 +1,9 @@
+<div style="margin: 20px;">
+    <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Posts details</mat-label>
+        <textarea matInput style="width: 100%; height: 30vh;" [(ngModel)]="markdown"></textarea>
+    </mat-form-field>
+</div>
+
+
+<app-siripiri-markdown [markdownValue]="markdown"></app-siripiri-markdown>
