@@ -8,19 +8,7 @@ class HeaderBuilder implements HTMLBuilder {
     private element: HTMLHeadElement;
 
     constructor(line: string, level?: number) {
-        if (level === undefined || level === null) {
-            level = 0;
-            for (let i = 0; i < line.length; i++) {
-                if (line.charAt(i) === '#') level++;
-                else break;
-            }
-        } else if (level > 2) {
-            level = 2;
-        }
-
         this.element = document.createElement(`h${level}`) as HTMLHeadElement;
-        if(line.startsWith('#'))
-            line = line.slice(level, line.length);
         this.element.innerHTML = line;
     }
 
