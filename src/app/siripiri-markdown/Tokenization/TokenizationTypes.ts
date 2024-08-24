@@ -1,13 +1,13 @@
 interface AstRoot {
     type: TokenType;
-    children: Array<any | null>;
+    children: Array<{ element: Element } | null>;
     position: Position;
 }
 
 interface Element {
     type: TokenType;
     tagName: string;
-    children: Array<{text: Text } | null>;
+    children: Array<{ text: Text } | null>;
     position: Position
 }
 

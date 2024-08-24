@@ -24,6 +24,11 @@ export class SiripiriMarkdownComponent implements OnChanges {
     if (this.markdownValue === undefined)
       return;
     let parser = new Parser(this.markdownValue);
+    let output = document.getElementById('output');
+    if(output == null)
+        return;
+    output.innerHTML = ``;
+    output.appendChild(parser.parse());
   }
 
   tokenizationBuilder() {
