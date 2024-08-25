@@ -1,13 +1,21 @@
-import { TokenType, Text, Element } from "../TokenizationTypes";
+import { Text, Element, Position } from "../TokenizationTypes";
+import { TokenUtils } from "../TokenUtils";
 import { TokenStrategy } from "./TokenStrategy";
 
 class ParagraphTokenStrategy implements TokenStrategy {
-    private regExp: RegExp = /^(?!\s*$)(?![#>\-*`]).+/;
+
+    private regExp: RegExp = /^(?!\s*$)(?!(\d+)\.\s+(.*))(?![#>\-*`]).+/;
+    tokenUtils: TokenUtils;
+    
+    constructor(tokenUtils: TokenUtils) {
+        this.tokenUtils = tokenUtils;
+    }
 
     isMatch(markdown: string, line: number): boolean {
         let lines = markdown.split(`\n`);
         return this.regExp.test(lines[line]);
     }
+    
     tokenize(markdown: string, line: number): { element: Element; } | null {
         let lines: string[] = markdown.split(`\n`);
         console.log(`lines: ${lines}, lineCounter: ${line}`);
@@ -24,44 +32,15 @@ class ParagraphTokenStrategy implements TokenStrategy {
         return this.paragraphJsonBuilder(lines, line, lineCounter);
     }
 
-    private paragraphJsonBuilder(markdown: string[], startLine: number, endLine: number) {
+    private paragraphJsonBuilder(markdown: string[], startLine: number, endLine: number): { element: Element } {
         let value: string = markdown[startLine];
-        for(let i= startLine+1; i<endLine; i++) {
+        for(let i=startLine+1; i<endLine; i++)
             value = `${value}\n${markdown[i]}`;
-        }
-        console.log(value, startLine, endLine);
-        const textToken: Text = {
-            type: TokenType.TEXT,
-            value: value,
-            position: {
-                start: {
-                    line: startLine+1,
-                    column: 0
-                },
-                end: {
-                    line: endLine,
-                    column: markdown[endLine-1].length
-                }
-            }
-        };
-        const token: Element = {
-            type: TokenType.ELEMENT,
-            tagName: `p`,
-            children: [{text: textToken}],
-            position: {
-                start: {
-                    line: startLine+1,
-                    column: 0
-                },
-                end: {
-                    line: endLine,
-                    column: markdown[endLine-1].length
-                }
-            }
-        }
-        return {element: token};
+        const position: Position = this.tokenUtils.positionJsonBuilder(startLine+1, 0, endLine, 0);
+        const textToken: { text: Text } = this.tokenUtils.textTokenJsonBuilder(value, position);
+        const element: {element: Element} = this.tokenUtils.elementWithinTextTokenJsonBuilder(`p`, textToken, position);
+        return element;
     }
-
 }
 
 export {

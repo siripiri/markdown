@@ -1,8 +1,15 @@
-import { TokenType, Text, Element } from "../TokenizationTypes";
+import { Text, Element, Position } from "../TokenizationTypes";
+import { TokenUtils } from "../TokenUtils";
 import { TokenStrategy } from "./TokenStrategy";
 
 class HeaderTokenStrategy implements TokenStrategy {
+
     private regExp: RegExp = /(?:\s|^)(#{1,6})(?:\s{1})(.+)/;
+    tokenUtils: TokenUtils;
+
+    constructor(tokenUtils: TokenUtils) {
+        this.tokenUtils = tokenUtils;
+    }
 
     isMatch(markdown: string, line: number): boolean {
         console.log(`In Header`);
@@ -16,52 +23,17 @@ class HeaderTokenStrategy implements TokenStrategy {
         let results = this.regExp.exec(lines[line].trim());
         if (results != null) {
             line = line + 1;
-            return {element: this.headerElementJsonBuilder(results, lines[0], line)};
+            return this.headerJsonBuilder(results, lines[0], line);
         }
         return null;
     }
 
-    private textJsonBuilder(results: RegExpExecArray, line: number) {
-        let tag = results[1];
+    private headerJsonBuilder(results: RegExpExecArray, line: string, lineLen: number) {
+        let tagLen: number = results[1].length;
         let value = results[2];
-
-        const textToken: Text = {
-            type: TokenType.TEXT,
-            value: value,
-            position: {
-                start: {
-                    line: line,
-                    column: tag.length + 1,
-                },
-                end: {
-                    line: line,
-                    column: tag.length + 1 + value.length
-                }
-            }
-        }
-        return textToken;
-    }
-
-    private headerElementJsonBuilder(results: RegExpExecArray, line: string, linecounter: number) {
-        let tag = results[1];
-        const token: Element = {
-            type: TokenType.ELEMENT,
-            tagName: `h${tag.length}`,
-            children: [
-                { text: this.textJsonBuilder(results, linecounter) }
-            ],
-            position: {
-                start: {
-                    line: linecounter,
-                    column: 0
-                },
-                end: {
-                    line: linecounter,
-                    column: line.length + 1
-                }
-            }
-        }
-        return token;
+        const position: Position = this.tokenUtils.positionJsonBuilder(lineLen, 0, lineLen, 0);
+        const textToken: { text: Text } = this.tokenUtils.textTokenJsonBuilder(value, position);
+        return this.tokenUtils.elementWithinTextTokenJsonBuilder(`h${tagLen}`, textToken, position);
     }
 }
 

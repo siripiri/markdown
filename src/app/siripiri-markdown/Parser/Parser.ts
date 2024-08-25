@@ -42,7 +42,6 @@ class Parser {
         while (!this.token.noMoreTokens(lines)) {
             console.log(`In collectChild()`);
             this.lookAhead = this.token.getNextToken();
-            console.log(`asd: ` + JSON.stringify(this.lookAhead));
             if (this.lookAhead != null)
                 childrenToken.push(this.lookAhead);
             else
@@ -72,10 +71,15 @@ class Parser {
         if(element.children == null)
             return htmlElement;
 
-        element.children.forEach((child: { text: { value: string; }; } | null) => {
-            if (child !== null && child.text) {
+        element.children.forEach((child: any) => {
+            if(child == null)
+                return;
+            if ('text' in child && child.text !== null) {
                 const textNode = document.createTextNode(child.text.value);
                 htmlElement.appendChild(textNode);
+            } else if ('element' in child) {
+                const childHtmlElement = this.convertElementToHtml(child.element);
+                htmlElement.appendChild(childHtmlElement);
             }
         });
 

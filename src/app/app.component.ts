@@ -27,4 +27,13 @@ export class AppComponent {
 
   markdown : string | undefined;
   
+  preventTab(event: KeyboardEvent) {
+    if(event.key === `Tab`) {
+      event.preventDefault();
+      if(this.markdown != null)
+        this.markdown = this.markdown + `\t`;
+      else
+        this.markdown = `\t`;
+    }
+  }
 }

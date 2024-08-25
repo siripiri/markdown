@@ -2,6 +2,8 @@ import { Element } from "./TokenizationTypes";
 import { TokenStrategy } from "./Strategy/TokenStrategy";
 import { HeaderTokenStrategy } from "./Strategy/HeaderTokenStrategy";
 import { ParagraphTokenStrategy } from "./Strategy/ParagraphTokenStrategy";
+import { OrderedListTokenStrategy } from "./Strategy/OrderedListTokenStrategy";
+import { TokenUtils } from "./TokenUtils";
 
 class Tokenization {
     public markdownString: string;
@@ -11,9 +13,11 @@ class Tokenization {
     constructor(markdownString: string) {
         this.markdownString = markdownString;
         this.line = 0;
+        let tokenUtils = new TokenUtils();
         this.__tokenStrategies = [
-            new HeaderTokenStrategy(),
-            new ParagraphTokenStrategy()
+            new HeaderTokenStrategy(tokenUtils),
+            new ParagraphTokenStrategy(tokenUtils),
+            new OrderedListTokenStrategy(tokenUtils)
         ]
     }
 

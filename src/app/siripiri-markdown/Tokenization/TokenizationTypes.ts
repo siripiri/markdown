@@ -7,7 +7,7 @@ interface AstRoot {
 interface Element {
     type: TokenType;
     tagName: string;
-    children: Array<{ text: Text } | null>;
+    children: Array<{ text: Text } | {element: Element} | null>;
     position: Position
 }
 
@@ -54,5 +54,6 @@ export {
     // Html Elements
     Element,
     // Text
-    Text
+    Text,
+    Position
 }
